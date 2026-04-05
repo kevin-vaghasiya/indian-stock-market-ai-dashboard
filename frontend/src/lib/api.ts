@@ -116,4 +116,29 @@ export async function fetchRecentPredictions(limit = 50) {
   return data.data;
 }
 
+export async function fetchIndices() {
+  const { data } = await api.get("/api/market/indices");
+  return data.data;
+}
+
+export async function fetchSectors() {
+  const { data } = await api.get("/api/market/sectors");
+  return data.data;
+}
+
+export async function fetchFiiDii() {
+  const { data } = await api.get("/api/market/fii-dii");
+  return data;
+}
+
+export async function fetchVolumeSpikes() {
+  const { data } = await api.get("/api/market/volume-spikes");
+  return data.data;
+}
+
+export async function fetchMarketNews() {
+  const { data } = await api.get("/api/market/news");
+  return data.data;
+}
+
 export default api;

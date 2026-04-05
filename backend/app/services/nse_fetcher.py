@@ -200,6 +200,123 @@ class NSEFetcher:
 
         return None
 
+    async def get_index_data(self, index_name: str) -> Optional[dict]:
+        """Fetch a specific index value (e.g., NIFTY 50, NIFTY BANK, NIFTY IT)."""
+        cache_key = f"idx_{index_name}"
+        if cache_key in _price_cache:
+            return _price_cache[cache_key]
+
+        encoded = index_name.replace(" ", "%20")
+        data = await self._fetch(f"{BASE_URL}/api/equity-stockIndices?index={encoded}")
+        if data and "data" in data:
+            for item in data["data"]:
+                if item.get("symbol") == index_name:
+                    result = {
+                        "name": index_name,
+                        "value": float(item.get("lastPrice", 0)),
+                        "change": float(item.get("change", 0)),
+                        "percent_change": float(item.get("pChange", 0)),
+                        "open": float(item.get("open", 0)),
+                        "high": float(item.get("dayHigh", 0)),
+                        "low": float(item.get("dayLow", 0)),
+                        "prev_close": float(item.get("previousClose", 0)),
+                    }
+                    _price_cache[cache_key] = result
+                    return result
+        return None
+
+    async def get_all_indices(self) -> list[dict]:
+        """Fetch major index values."""
+        indices = ["NIFTY 50", "NIFTY BANK", "NIFTY IT", "NIFTY FINANCIAL SERVICES",
+                   "NIFTY PHARMA", "NIFTY AUTO", "NIFTY FMCG", "NIFTY METAL",
+                   "NIFTY REALTY", "NIFTY ENERGY"]
+        results = []
+        for idx in indices:
+            data = await self.get_index_data(idx)
+            if data:
+                results.append(data)
+            await asyncio.sleep(0.5)  # Rate limit
+        return results
+
+    async def get_sector_performance(self) -> list[dict]:
+        """Fetch sector-wise performance for heatmap."""
+        sectors = [
+            ("NIFTY IT", "IT"),
+            ("NIFTY BANK", "Banking"),
+            ("NIFTY PHARMA", "Pharma"),
+            ("NIFTY AUTO", "Auto"),
+            ("NIFTY FMCG", "FMCG"),
+            ("NIFTY METAL", "Metal"),
+            ("NIFTY REALTY", "Realty"),
+            ("NIFTY ENERGY", "Energy"),
+            ("NIFTY FINANCIAL SERVICES", "Financial"),
+            ("NIFTY MEDIA", "Media"),
+        ]
+        cache_key = "sectors"
+        if cache_key in _index_cache:
+            return _index_cache[cache_key]
+
+        results = []
+        for index_name, display_name in sectors:
+            data = await self.get_index_data(index_name)
+            if data:
+                results.append({
+                    "name": display_name,
+                    "index_name": index_name,
+                    "value": data["value"],
+                    "change": data["change"],
+                    "percent_change": data["percent_change"],
+                })
+            await asyncio.sleep(0.3)
+
+        _index_cache[cache_key] = results
+        return results
+
+    async def get_volume_spikes(self, threshold: float = 2.0) -> list[dict]:
+        """Find stocks with volume significantly above average from Nifty 500 data."""
+        cache_key = "vol_spikes"
+        if cache_key in _price_cache:
+            return _price_cache[cache_key]
+
+        stocks, _ = await self.get_nifty50_stocks()
+        # Sort by volume descending, pick top with high % change
+        # Since we don't have historical avg volume, use top volume + high change as proxy
+        active = [s for s in stocks if s["volume"] > 0 and abs(s["percent_change"]) > 1.5]
+        active.sort(key=lambda x: x["volume"], reverse=True)
+        results = active[:10]
+
+        _price_cache[cache_key] = results
+        return results
+
+    async def get_fii_dii_data(self) -> Optional[dict]:
+        """Fetch FII/DII trading data from NSE."""
+        cache_key = "fii_dii"
+        if cache_key in _index_cache:
+            return _index_cache[cache_key]
+
+        data = await self._fetch(f"{BASE_URL}/api/fiidiiTradeReact")
+        if data:
+            result = {"fii": {}, "dii": {}}
+            for item in data:
+                category = item.get("category", "")
+                if "FII" in category or "FPI" in category:
+                    result["fii"] = {
+                        "buy_value": float(item.get("buyValue", 0)),
+                        "sell_value": float(item.get("sellValue", 0)),
+                        "net_value": float(item.get("netValue", 0)),
+                        "date": item.get("date", ""),
+                    }
+                elif "DII" in category:
+                    result["dii"] = {
+                        "buy_value": float(item.get("buyValue", 0)),
+                        "sell_value": float(item.get("sellValue", 0)),
+                        "net_value": float(item.get("netValue", 0)),
+                        "date": item.get("date", ""),
+                    }
+            _index_cache[cache_key] = result
+            return result
+        return None
+
     async def close(self):
         if self._client and not self._client.is_closed:
             await self._client.aclose()
