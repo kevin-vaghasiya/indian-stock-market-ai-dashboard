@@ -13,8 +13,8 @@ CF_ACCOUNT_ID = os.getenv("CF_ACCOUNT_ID", "")
 CF_API_KEY = os.getenv("CF_API_KEY", "")
 CF_MODEL = "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
 
-# Cache buy scores for 30 minutes
-_score_cache = TTLCache(maxsize=200, ttl=1800)
+# Cache buy scores for 2 hours
+_score_cache = TTLCache(maxsize=200, ttl=7200)
 
 SYSTEM_PROMPT = """You are an expert Indian stock market analyst. You analyze stocks that are among today's top gainers on NSE.
 

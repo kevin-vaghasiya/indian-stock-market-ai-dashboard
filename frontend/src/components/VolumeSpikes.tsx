@@ -11,11 +11,12 @@ interface SpikeStock {
   volume: number;
 }
 
-function formatVolume(v: number): string {
-  if (v >= 10000000) return `${(v / 10000000).toFixed(1)}Cr`;
-  if (v >= 100000) return `${(v / 100000).toFixed(1)}L`;
-  if (v >= 1000) return `${(v / 1000).toFixed(0)}K`;
-  return String(v);
+function formatTurnover(volume: number, price: number): string {
+  const turnover = volume * price; // in rupees
+  if (turnover >= 1e9) return `Rs ${(turnover / 1e9).toFixed(0)}B`;  // billions (arab)
+  if (turnover >= 1e7) return `Rs ${(turnover / 1e7).toFixed(0)}Cr`;
+  if (turnover >= 1e5) return `Rs ${(turnover / 1e5).toFixed(0)}L`;
+  return `Rs ${(turnover / 1000).toFixed(0)}K`;
 }
 
 export default function VolumeSpikes() {
@@ -65,7 +66,7 @@ export default function VolumeSpikes() {
                   {s.percent_change >= 0 ? "+" : ""}{s.percent_change.toFixed(1)}%
                 </span>
                 <span className="text-[10px] font-mono text-yellow-400">
-                  {formatVolume(s.volume)}
+                  {formatTurnover(s.volume, s.ltp)}
                 </span>
               </div>
             </div>

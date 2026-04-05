@@ -7,7 +7,7 @@ import MarketNewsFeed from "../components/MarketNewsFeed";
 
 export default function Home() {
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 overflow-x-hidden">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">Market Dashboard</h1>
@@ -27,16 +27,16 @@ export default function Home() {
           <IndexCards />
           <SectorHeatmap />
           <FiiDiiCard />
-          <VolumeSpikes />
         </div>
 
         {/* Center - Main Table */}
-        <div className="order-1 lg:order-2">
+        <div className="order-1 lg:order-2 min-w-0">
           <GainersLosersTable />
         </div>
 
-        {/* Right Sidebar - News */}
-        <div className="order-3">
+        {/* Right Sidebar - Volume Spikes + News */}
+        <div className="order-3 space-y-3">
+          <VolumeSpikes />
           <MarketNewsFeed />
         </div>
       </div>

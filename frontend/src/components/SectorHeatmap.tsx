@@ -42,18 +42,20 @@ export default function SectorHeatmap() {
   return (
     <div className="bg-[#1a1d2e] rounded-lg border border-[#2a2d3e] p-3">
       <div className="text-xs font-semibold text-gray-400 mb-2">Sector Heatmap</div>
-      <div className="grid grid-cols-2 gap-1">
-        {(sectors || []).map((s: SectorData) => (
-          <div
-            key={s.name}
-            className={`rounded px-2 py-2 text-center ${getHeatColor(s.percent_change)}`}
-          >
-            <div className="text-[10px] font-medium truncate">{s.name}</div>
-            <div className="text-xs font-mono font-bold">
-              {s.percent_change >= 0 ? "+" : ""}{s.percent_change.toFixed(2)}%
+      <div className="overflow-y-auto max-h-[300px] pr-1">
+        <div className="grid grid-cols-2 gap-1">
+          {(sectors || []).map((s: SectorData) => (
+            <div
+              key={s.name}
+              className={`rounded px-2 py-2 text-center ${getHeatColor(s.percent_change)}`}
+            >
+              <div className="text-[10px] font-medium truncate">{s.name}</div>
+              <div className="text-xs font-mono font-bold">
+                {s.percent_change >= 0 ? "+" : ""}{s.percent_change.toFixed(2)}%
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </div>
   );
