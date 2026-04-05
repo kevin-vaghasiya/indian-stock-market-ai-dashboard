@@ -8,6 +8,7 @@ const links = [
   { href: "/holdings", label: "Holdings" },
   { href: "/trading", label: "Paper Trading" },
   { href: "/predictions", label: "Predictions" },
+  { href: "/bot", label: "AI Bot" },
 ];
 
 export default function Navbar() {

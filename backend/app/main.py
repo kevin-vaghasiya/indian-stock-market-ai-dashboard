@@ -8,7 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 
 from .models.database import init_db, close_db
-from .routers import market, company, news, paper_trading, buy_score, predictions
+from .routers import market, company, news, paper_trading, buy_score, predictions, bot
 from .services.nse_fetcher import nse
 
 logging.basicConfig(level=logging.INFO)
@@ -18,6 +18,8 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await init_db()
+    from .services.bot_engine import init_bot_wallet
+    await init_bot_wallet()
     logger.info("MongoDB initialized")
     yield
     await close_db()
@@ -41,6 +43,7 @@ app.include_router(news.router)
 app.include_router(paper_trading.router)
 app.include_router(buy_score.router)
 app.include_router(predictions.router)
+app.include_router(bot.router)
 
 
 @app.get("/")

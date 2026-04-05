@@ -141,4 +141,45 @@ export async function fetchMarketNews() {
   return data.data;
 }
 
+// Bot API
+export async function fetchBotStats() {
+  const { data } = await api.get("/api/bot/stats");
+  return data;
+}
+
+export async function fetchBotPositions() {
+  const { data } = await api.get("/api/bot/positions");
+  return data.data;
+}
+
+export async function fetchBotOrders(limit = 50) {
+  const { data } = await api.get(`/api/bot/orders?limit=${limit}`);
+  return data.data;
+}
+
+export async function fetchBotLogs(limit = 100) {
+  const { data } = await api.get(`/api/bot/logs?limit=${limit}`);
+  return data.data;
+}
+
+export async function fetchBotCompletedTrades(limit = 50) {
+  const { data } = await api.get(`/api/bot/completed-trades?limit=${limit}`);
+  return data.data;
+}
+
+export async function runBot() {
+  const { data } = await api.post("/api/bot/run");
+  return data;
+}
+
+export async function checkBotSells() {
+  const { data } = await api.post("/api/bot/check-sells");
+  return data;
+}
+
+export async function resetBot() {
+  const { data } = await api.post("/api/bot/reset");
+  return data;
+}
+
 export default api;

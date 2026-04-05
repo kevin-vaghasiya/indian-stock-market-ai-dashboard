@@ -38,6 +38,11 @@ async def init_db():
     await db.predictions.create_index([("predicted_at", -1)])
     await db.price_snapshots.create_index([("symbol", 1), ("date", 1)], unique=True)
 
+    # Bot collections
+    await db.bot_positions.create_index("symbol")
+    await db.bot_orders.create_index([("timestamp", -1)])
+    await db.bot_logs.create_index([("timestamp", -1)])
+
     logger.info(f"MongoDB connected: {MONGODB_DB}")
 
 
