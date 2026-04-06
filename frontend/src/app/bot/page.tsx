@@ -148,22 +148,32 @@ export default function BotPage() {
       )}
 
       {/* Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2">
+      <div className="grid grid-cols-2 sm:grid-cols-5 lg:grid-cols-10 gap-2">
         <StatCard label="Cash" value={`Rs ${(stats?.cash_balance || 0).toLocaleString("en-IN")}`} />
-        <StatCard label="Invested" value={`Rs ${(stats?.invested || 0).toLocaleString("en-IN")}`} />
+        <StatCard label="Invested (Cost)" value={`Rs ${(stats?.invested || 0).toLocaleString("en-IN")}`} />
+        <StatCard label="Current Value" value={`Rs ${(stats?.current_value || 0).toLocaleString("en-IN")}`} />
         <StatCard label="Total Value" value={`Rs ${(stats?.total_value || 0).toLocaleString("en-IN")}`} />
         <StatCard
-          label="P&L"
+          label="Unrealized P&L"
+          value={`${(stats?.unrealized_pnl || 0) >= 0 ? "+" : ""}Rs ${(stats?.unrealized_pnl || 0).toLocaleString("en-IN")}`}
+          color={(stats?.unrealized_pnl || 0) >= 0 ? "text-[#22c55e]" : "text-[#ef4444]"}
+        />
+        <StatCard
+          label="Realized P&L"
+          value={`${(stats?.realized_pnl || 0) >= 0 ? "+" : ""}Rs ${(stats?.realized_pnl || 0).toLocaleString("en-IN")}`}
+          color={(stats?.realized_pnl || 0) >= 0 ? "text-[#22c55e]" : "text-[#ef4444]"}
+        />
+        <StatCard
+          label="Total P&L"
           value={`${pnl >= 0 ? "+" : ""}Rs ${pnl.toLocaleString("en-IN")}`}
           color={pnl >= 0 ? "text-[#22c55e]" : "text-[#ef4444]"}
         />
-        <StatCard label="Total Trades" value={String(stats?.total_trades || 0)} />
         <StatCard
           label="Win Rate"
           value={`${stats?.win_rate || 0}%`}
           color={(stats?.win_rate || 0) >= 60 ? "text-[#22c55e]" : (stats?.win_rate || 0) >= 40 ? "text-yellow-400" : "text-[#ef4444]"}
         />
-        <StatCard label="Wins / Losses" value={`${stats?.wins || 0} / ${stats?.losses || 0}`} />
+        <StatCard label="Trades (W/L)" value={`${stats?.wins || 0} / ${stats?.losses || 0}`} />
         <StatCard label="Open Positions" value={String(stats?.open_positions || 0)} />
       </div>
 

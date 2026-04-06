@@ -251,15 +251,33 @@ async def bot_get_stats() -> dict:
     total_profit = sum(t.get("profit", 0) for t in completed)
     win_rate = round(wins / total_trades * 100, 1) if total_trades > 0 else 0
 
-    # Open positions
+    # Open positions - fetch live prices for unrealized P&L
     open_pos = await db.bot_positions.find({"quantity": {"$gt": 0}}).to_list(length=50)
-    invested = sum(p["buy_price"] * p["quantity"] for p in open_pos)
+    invested = 0.0
+    current_value = 0.0
+    unrealized_pnl = 0.0
+
+    for p in open_pos:
+        cost = p["buy_price"] * p["quantity"]
+        invested += cost
+        quote = await nse.get_quote(p["symbol"])
+        if quote:
+            live_val = quote["ltp"] * p["quantity"]
+            current_value += live_val
+            unrealized_pnl += (live_val - cost)
+        else:
+            current_value += cost  # fallback to cost if no quote
+
+    cash = wallet["cash_balance"] if wallet else 0
 
     return {
-        "cash_balance": round(wallet["cash_balance"], 2) if wallet else 0,
+        "cash_balance": round(cash, 2),
         "invested": round(invested, 2),
-        "total_value": round((wallet["cash_balance"] if wallet else 0) + invested, 2),
+        "current_value": round(current_value, 2),
+        "total_value": round(cash + current_value, 2),
         "initial_balance": wallet.get("initial_balance", 1000000) if wallet else 1000000,
+        "unrealized_pnl": round(unrealized_pnl, 2),
+        "realized_pnl": round(total_profit, 2),
         "total_trades": total_trades,
         "wins": wins,
         "losses": total_trades - wins,
