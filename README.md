@@ -19,7 +19,14 @@ This dashboard automates the entire screening part of that strategy.
 
 ## Screenshots
 
-> _Coming soon_
+### Market Dashboard
+![Market Dashboard](screenshots/dashboard.png)
+
+### AI Buy Score Analysis
+![AI Score Modal](screenshots/ai-score-modal.png)
+
+### Paper Trading
+![Paper Trading](screenshots/paper-trading.png)
 
 ## Tech Stack
 
