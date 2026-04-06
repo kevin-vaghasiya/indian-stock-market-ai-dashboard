@@ -15,6 +15,7 @@ MAX_OPEN_POSITIONS = 5
 SELL_TARGET_MIN = 0.05  # 5%
 SELL_TARGET_MAX = 0.07  # 7%
 TRAILING_DROP = 0.02  # Sell if drops 2% from peak after hitting 5%
+MIN_GAIN_TO_BUY = 0.03  # Skip stocks not up at least 3%
 
 
 async def init_bot_wallet():
@@ -74,6 +75,12 @@ async def bot_scan_and_buy() -> dict:
         # Skip if already holding
         existing = await db.bot_positions.find_one({"symbol": symbol, "quantity": {"$gt": 0}})
         if existing:
+            continue
+
+        # Skip stocks not up at least 3%
+        pct_change = stock.get("percent_change", 0)
+        if pct_change < MIN_GAIN_TO_BUY * 100:
+            await _log("SKIP_BUY", symbol, f"Gain only {pct_change:.1f}% (min {MIN_GAIN_TO_BUY*100}%)")
             continue
 
         # Compute signal

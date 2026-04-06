@@ -45,8 +45,8 @@ export default function VolumeSpikes() {
       {!spikes || spikes.length === 0 ? (
         <div className="text-xs text-gray-500">No volume spikes detected</div>
       ) : (
-        <div className="space-y-1">
-          {spikes.slice(0, 6).map((s: SpikeStock) => (
+        <div className="space-y-1 max-h-[280px] overflow-y-auto">
+          {spikes.map((s: SpikeStock) => (
             <div
               key={s.symbol}
               className="flex items-center justify-between py-1 px-1.5 rounded hover:bg-[#2a2d3e]/30"
